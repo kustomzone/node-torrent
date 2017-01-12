@@ -1,6 +1,10 @@
-# node-torrent [![Build Status](https://secure.travis-ci.org/fent/node-torrent.png)](http://travis-ci.org/fent/node-torrent)
+# node-torrent
 
 Read, make, and hash check torrents with node.js!
+
+[![Build Status](https://secure.travis-ci.org/fent/node-torrent.svg)](http://travis-ci.org/fent/node-torrent)
+[![Dependency Status](https://gemnasium.com/fent/node-torrent.svg)](https://gemnasium.com/fent/node-torrent)
+[![codecov](https://codecov.io/gh/fent/node-torrent/branch/master/graph/badge.svg)](https://codecov.io/gh/fent/node-torrent)
 
 # Usage
 
@@ -15,7 +19,7 @@ nt.read('path/to/file.torrent', function(err, torrent) {
 });
 
 
-// if url is given, it will be downloaded
+// If url is given, it will be downloaded.
 nt.read('http://torrents.me/download.php?id=2342', function(err, torrent) {
   if (err) throw err;
   console.log(torrent.metadata);
@@ -40,7 +44,7 @@ nt.makeWrite('outputfile', 'http://announce.me', __dirname + '/files',
 ## Hash check a torrent
 
 ```js
-var hasher = nt.hashCheck(file);
+var hasher = torrent.hashCheck(file);
 
 var p;
 hasher.on('match', function(i, hash, percent) {
@@ -59,22 +63,6 @@ hasher.on('end', function() {
 
 Reads a local file, remote file, or a readable stream. If `file` is a URL, it will be downloaded. `requestOptions` is optional, and can be used to customize the http request made by [request](https://github.com/mikeal/request). Returns readable stream.
 
-### readURL(url, [requestOptions], callback(Error, Torrent))
-
-Downloads a torrent from a URL. `requestOptions` optionally can be used to customize the request. Returns readable stream.
-
-### readFile(file, callback(Error, Torrent))
-
-Reads a torrent file. Returns readable stream.
-
-### readStream(readstream, callback(Error, Torrent))
-
-Reads torrent data from a readable stream. Returns the readable stream.
-
-### readRaw(data, callback(Error, Torrent))
-
-Parses raw torrent data. `data` must be a buffer.
-
 An error can be returned if the torrent is formatted incorrectly. Does not check if the dictonaries are listed alphabetically. Refer to the [BitTorrent Specification](http://wiki.theory.org/BitTorrentSpecification) for more info on torrent metainfo.
 
 ### make(announceURL, dir, [files], [options], [callback(Error, Torrent)])
@@ -86,7 +74,7 @@ Makes a new torrent. `dir` is root directory of the torrent. The `files` array w
 * `name` - Can be used only in multi file mode. If not given, defaults to name of directory.
 * `pieceLength` - How to break up the pieces. Must be an integer `n` that says piece length will be `2^n`. Default is 256KB, or 2^18.
 * `private` - Set true if this is a private torrent.
-* `source` - This goes into the `info` dictionary of the torrent. Useful if you want to make a torrent have a unique info hash from a certain tracker.
+* `moreInfo` - These go into the `info` dictionary of the torrent. Useful if you want to make a torrent have a unique info hash from a certain tracker.
 * `maxFiles` - Max files to open during piece hashing. Defaults to 250.
 
 `callback` is called with a possible `Error`, and a `Torrent` object when hashing is finished.
@@ -135,7 +123,7 @@ Creates a ReadableStream that emits raw bencoded data for this torrent. Returns 
 
 ### Torrent#createWriteStream(filepath)
 
-Shortcut that pipes the stream from `Torrent#createReadStream()` to a WritableStream. Returns the readable stream.
+Shortcut that pipes the stream from `Torrent#createReadStream()` to a writable file stream. Returns the writable stream.
 
 ### Torrent#hashCheck(dir, [options])
 
@@ -144,7 +132,7 @@ Hash checks torrent against files in `dir`. Returns a Hasher object. `options` h
 
 ## Hasher
 
-A Hasher object is returned when a torrent is created with `make` and when a torrent is hash checked with `hashCheck` or `Torrent#hashCheck`. It inherits from ReadableStream.
+A Hasher object is returned when a torrent is created with `make` and when `Torrent#hashCheck` is called. It inherits from ReadableStream.
 
 ### Hasher#pause()
 
@@ -197,17 +185,10 @@ Error hash checking.
 Hash checking is finished.
 
 
-# Command Line
-
-nt can be ran from the command line too! Install it with the `-g` flag with npm and use it with the command `nt`.
-
-![example img](http://i.imgur.com/y47Sc.png)
-
-
 # Install
 
 ```bash
-npm -g install nt
+npm install nt
 ```
 
 

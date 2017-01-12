@@ -1,3 +1,4 @@
+/*jshint maxlen: false */
 var nt     = require('..');
 var vows   = require('vows');
 var assert = require('assert');
@@ -7,56 +8,14 @@ var url    = require('url');
 var nock   = require('nock');
 
 
-var file1 = path.join(__dirname, 'torrents', 'ubuntu.torrent');
 var file2 = path.join(__dirname,'torrents', 'click.jpg.torrent');
 var file3 = path.join(__dirname, 'torrents', 'virtualbox.torrent');
 var remotefile3 = 'http://www.mininova.org/get/2886852';
 var file4 = path.join(__dirname, 'torrents', 'chipcheezum.torrent');
 
 
-// Mock request to remote file.
-var parsedUrl = url.parse(remotefile3);
-nock('http://' + parsedUrl.host)
-  .get(parsedUrl.pathname)
-  .replyWithFile(200, file3);
-
-
 vows.describe('Read')
   .addBatch({
-    'Read raw bencoded torrent data': {
-      topic: function() {
-        nt.readRaw(fs.readFileSync(file1), this.callback);
-      },
-
-      'Info hash matches': function(result) {
-        assert.isObject(result.metadata);
-        assert.equal(result.infoHash(),
-          'a38d02c287893842a32825aa866e00828a318f07');
-      },
-      'Announce URL is correct': function(result) {
-        assert.isObject(result.metadata);
-        assert.include(result.metadata, 'announce');
-        assert.equal(result.metadata.announce, 'udp://tracker.publicbt.com:80');
-      },
-      'Single file mode': function(result) {
-        assert.isObject(result.metadata);
-        assert.include(result.metadata, 'info');
-        assert.include(result.metadata.info, 'name');
-        assert.equal(result.metadata.info.name,
-                     'ubuntu-11.04-desktop-i386.iso');
-        assert.isUndefined(result.metadata.info.files);
-        assert.include(result.metadata.info, 'length');
-        assert.equal(result.metadata.info.length, 718583808);
-      },
-      '512 KB piece length': function(result) {
-        assert.isObject(result.metadata);
-        assert.include(result.metadata, 'info');
-        assert.include(result.metadata.info, 'piece length');
-        assert.equal(result.metadata.info['piece length'], 524288);
-      }
-    },
-
-
     // This torrent was created with mktorrent.
     'Read a local file': {
       'made by mktorrent': {
@@ -124,9 +83,14 @@ vows.describe('Read')
       }
     },
 
-
     'Download a torrent and read it': {
       topic: function() {
+        // Mock request to remote file.
+        var parsedUrl = url.parse(remotefile3);
+        nock('http://' + parsedUrl.host)
+          .get(parsedUrl.pathname)
+          .replyWithFile(200, file3);
+
         nt.read(remotefile3, this.callback);
       },
 
